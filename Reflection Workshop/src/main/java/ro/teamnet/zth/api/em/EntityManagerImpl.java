@@ -25,7 +25,8 @@ public class EntityManagerImpl implements EntityManager {
         List<ColumnInfo> columns = EntityUtils.getColumns(entityClass);
         List<Field> fields = EntityUtils.getFieldsByAnnotations(entityClass, Id.class);
 
-        String fieldName = fields.get(0).getName();
+        String fieldName = ((Id)fields.get(0).getDeclaredAnnotation(Id.class)).name();
+        System.out.println(fields);
         Condition cond = new Condition(fieldName, id);
 
         queryBuilder.setTableName(tableName);
@@ -46,7 +47,7 @@ public class EntityManagerImpl implements EntityManager {
                 for (ColumnInfo col : columns) {
                     f = entityClass.getDeclaredField(col.getColumnName());
                     f.setAccessible(true);
-                    f.set(elem, resultSet.getObject(col.getDbName()));
+                    f.set(elem, EntityUtils.castFromSqlType(resultSet.getObject(col.getDbName()), f.getType()));
                 }
             }
             return elem;
