@@ -15,7 +15,11 @@ import java.io.RandomAccessFile;
 import java.util.Date;
 
 public class LogFileWriter {
+<<<<<<< HEAD
+    public static final String TOMCAT_PATH="/usr/local/tomcat";
+=======
     public static final String TOMCAT_PATH=System.getenv("CATALINA_HOME").replace(";","");
+>>>>>>> 8addadda9b94709aeb35e629b630215cab0ff8be
 
     /**
      * This method log headers to %CATALINA_HOME%\logs\header.log

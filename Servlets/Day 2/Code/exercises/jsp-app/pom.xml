@@ -52,7 +52,11 @@
                 <version>2.2</version>
                 <configuration>
                     <server>local_tomcat</server>
-                    <url>http://docker.local:49100/manager/text</url>
+<<<<<<< HEAD
+                    <url>http://localhost:8090/manager/text</url>
+=======
+                    <url>http://192.168.99.100:49100/manager/text</url>
+>>>>>>> 8addadda9b94709aeb35e629b630215cab0ff8be
                 </configuration>
             </plugin>
         </plugins>

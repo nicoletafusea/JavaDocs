@@ -6,6 +6,18 @@
 
   <display-name>Archetype Created Web Application</display-name>
 
+<<<<<<< HEAD
+    <filter>
+        <filter-name>logHeaders</filter-name>
+        <filter-class>ro.teamnet.zth.web.HeadersLogFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>logHeaders</filter-name>
+        <servlet-name>HelloWorld</servlet-name>
+    </filter-mapping>
+
+=======
+>>>>>>> 8addadda9b94709aeb35e629b630215cab0ff8be
     <servlet>
         <servlet-name>HelloWorld</servlet-name>
         <servlet-class>ro.teamnet.zth.web.HelloWorldServlet</servlet-class>
@@ -14,6 +26,54 @@
         <servlet-name>HelloWorld</servlet-name>
         <url-pattern>/hello</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>HelloWorldForward</servlet-name>
+        <servlet-class>ro.teamnet.zth.web.HelloWorldServletForward</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HelloWorldForward</servlet-name>
+        <url-pattern>/helloforward</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>A</servlet-name>
+        <servlet-class>ro.teamnet.zth.web.HttpServletInclude</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>A</servlet-name>
+        <url-pattern>/include</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>B</servlet-name>
+        <servlet-class>ro.teamnet.zth.web.HttpServletIncluded</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>B</servlet-name>
+        <url-pattern>/included</url-pattern>
+    </servlet-mapping>
+
+<<<<<<< HEAD
+    <servlet>
+        <servlet-name>Session</servlet-name>
+        <servlet-class>ro.teamnet.zth.web.HttpSessionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Session</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+=======
+    <filter>
+        <filter-name>logHeaders</filter-name>
+        <filter-class>ro.teamnet.zth.web.HeadersLogFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>logHeaders</filter-name>
+        <servlet-name>HelloWorld</servlet-name>
+    </filter-mapping>
+>>>>>>> 8addadda9b94709aeb35e629b630215cab0ff8be
+
 
     <welcome-file-list>
         <welcome-file>/index.jsp</welcome-file>

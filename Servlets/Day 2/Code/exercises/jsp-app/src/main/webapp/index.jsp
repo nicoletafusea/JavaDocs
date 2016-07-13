@@ -9,7 +9,7 @@
 
 <div>
 
-    <form id="form1" name="hello" action="hello">
+    <form id="form1" name="/include" action="include">
         <label for="user">User:</label>
         <input type="text" id="user" name="user"/>
     </form>
