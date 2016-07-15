@@ -1,8 +1,10 @@
 package ro.teamnet.zth;
 
 
+import org.codehaus.jackson.map.ObjectMapper;
 import ro.teamnet.zth.api.annotations.MyController;
 import ro.teamnet.zth.api.annotations.MyRequestMethod;
+import ro.teamnet.zth.api.annotations.MyRequestParam;
 import ro.teamnet.zth.appl.controller.DepartmentController;
 import ro.teamnet.zth.appl.controller.EmployeeController;
 import ro.teamnet.zth.fmk.AnnotationScanUtils;
@@ -16,7 +18,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by user on 7/14/2016.
@@ -51,7 +56,7 @@ public class MyDispatcherServlet extends HttpServlet {
                             methodAttributes.setControllerClass(controller.getName());
                             methodAttributes.setMethodType(myMethodAnnot.methodType());
                             methodAttributes.setMethodName(controllerMethod.getName());
-
+                            methodAttributes.setParameterTypes(controllerMethod.getParameterTypes());
                             allowedMethods.put(urlPath, methodAttributes);
                         }
                     }
@@ -94,25 +99,40 @@ public class MyDispatcherServlet extends HttpServlet {
     }
 
     private void reply(Object r, HttpServletRequest req, HttpServletResponse res) throws IOException {
+        ObjectMapper o = new ObjectMapper();
+        String resp = o.writeValueAsString(r);
         PrintWriter out = res.getWriter();
-        out.print(r.toString());
+        out.print(resp);
     }
 
-    private Object dispatch(HttpServletRequest req, HttpServletResponse res) {
+    private Object dispatch(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String pathInfo = req.getPathInfo();
 
         //caut in registru
         MethodAttributes methodAttributes = allowedMethods.get(pathInfo);
         if (methodAttributes == null) {
-            return "hello";
+            return "null hello";
         } else {
             String controllerName = methodAttributes.getControllerClass();
             try {
                 Class controllerClass = Class.forName(controllerName);
                 Object controllerInstance = controllerClass.newInstance();
-                Method method = controllerClass.getMethod(methodAttributes.getMethodName());
-                Object result = method.invoke(controllerInstance);
-                return result;
+                Method method = controllerClass.getMethod(methodAttributes.getMethodName(),
+                        methodAttributes.getParameterTypes());
+                Parameter[] parameters = method.getParameters();
+                List<Object> paramValues = new ArrayList<>();
+                for (Parameter param : parameters) {
+                    if (param.isAnnotationPresent(MyRequestParam.class)) {
+                        MyRequestParam annotation = param.getAnnotation(MyRequestParam.class);
+                        String name = annotation.name();
+                        String requestParamValue = req.getParameter(name);
+                        Class<?> type = param.getType();
+                        Object object = new ObjectMapper().readValue(requestParamValue, type);
+                        paramValues.add(object);
+                    }
+                }
+
+                return method.invoke(controllerInstance, paramValues.toArray());
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
