@@ -4,6 +4,7 @@ package ro.teamnet.zth;
 import org.codehaus.jackson.map.ObjectMapper;
 import ro.teamnet.zth.api.annotations.MyController;
 import ro.teamnet.zth.api.annotations.MyRequestMethod;
+import ro.teamnet.zth.api.annotations.MyRequestObject;
 import ro.teamnet.zth.api.annotations.MyRequestParam;
 import ro.teamnet.zth.appl.controller.DepartmentController;
 import ro.teamnet.zth.appl.controller.EmployeeController;
@@ -14,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -57,10 +59,11 @@ public class MyDispatcherServlet extends HttpServlet {
                             methodAttributes.setMethodType(myMethodAnnot.methodType());
                             methodAttributes.setMethodName(controllerMethod.getName());
                             methodAttributes.setParameterTypes(controllerMethod.getParameterTypes());
-                            allowedMethods.put(urlPath, methodAttributes);
+                            allowedMethods.put(getControllerKey(myMethodAnnot.methodType(), urlPath), methodAttributes);
                         }
                     }
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,6 +71,10 @@ public class MyDispatcherServlet extends HttpServlet {
             ex.printStackTrace();
         }
 
+    }
+
+    private String getControllerKey(String methodType, String urlPath) {
+        return urlPath+" "+methodType;
     }
 
     @Override
@@ -82,11 +89,15 @@ public class MyDispatcherServlet extends HttpServlet {
         dispatchReply("GET", req, resp);
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+        dispatchReply("DELETE", req, resp);
+    }
 
     private void dispatchReply(String fct, HttpServletRequest req, HttpServletResponse res) {
         Object r = null;
         try {
-            r = dispatch(req, res);
+            r = dispatch(req, res, fct);
         } catch (Exception ex) {
             sendExceptionError(ex, req, res);
         }
@@ -105,11 +116,11 @@ public class MyDispatcherServlet extends HttpServlet {
         out.print(resp);
     }
 
-    private Object dispatch(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    private Object dispatch(HttpServletRequest req, HttpServletResponse res, String methodType) throws IOException {
         String pathInfo = req.getPathInfo();
-
+        String key = getControllerKey(methodType, pathInfo);
         //caut in registru
-        MethodAttributes methodAttributes = allowedMethods.get(pathInfo);
+        MethodAttributes methodAttributes = allowedMethods.get(key);
         if (methodAttributes == null) {
             return "null hello";
         } else {
@@ -127,8 +138,18 @@ public class MyDispatcherServlet extends HttpServlet {
                         String name = annotation.name();
                         String requestParamValue = req.getParameter(name);
                         Class<?> type = param.getType();
-                        Object object = new ObjectMapper().readValue(requestParamValue, type);
+                        Object object = null;
+                        if (type.equals(String.class)) {
+                            object = requestParamValue;
+                        } else {
+                            object = new ObjectMapper().readValue(requestParamValue, type);
+                        }
                         paramValues.add(object);
+                    }
+                    else if (param.isAnnotationPresent(MyRequestObject.class)) {
+                        BufferedReader br = req.getReader();
+                        Object reqBody = new ObjectMapper().readValue(br, param.getType());
+                        paramValues.add(reqBody);
                     }
                 }
 

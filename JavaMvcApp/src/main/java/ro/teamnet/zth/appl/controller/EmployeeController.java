@@ -7,8 +7,6 @@ import ro.teamnet.zth.appl.domain.Employee;
 import ro.teamnet.zth.appl.service.EmployeeService;
 import ro.teamnet.zth.appl.service.EmployeeServiceImpl;
 
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.List;
 
 /**
@@ -16,7 +14,7 @@ import java.util.List;
  */
 @MyController(urlPath = "/employees")
 public class EmployeeController {
-    private EmployeeService employeeService = new EmployeeServiceImpl();
+    private final EmployeeService employeeService = new EmployeeServiceImpl();
 
     @MyRequestMethod(urlPath = "/all")
     public List<Employee> getAllEmployees() {

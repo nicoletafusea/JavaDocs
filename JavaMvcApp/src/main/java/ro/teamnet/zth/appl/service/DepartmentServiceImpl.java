@@ -12,8 +12,11 @@ import java.util.List;
 public class DepartmentServiceImpl implements DepartmentService {
     private DepartmentDao departmentDao = new DepartmentDao();
 
-    @Override
     public List<Department> findAllDepartments() {
         return departmentDao.findAllDepartments();
+    }
+
+    public Department findOneDepartment(Long id) {
+        return departmentDao.findDepartmentById(id);
     }
 }
